@@ -1,0 +1,1 @@
+const analytics_icon = "assets/analytics_icon.png";
