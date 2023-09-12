@@ -1,8 +1,11 @@
-
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
+import 'package:draggable_fab/draggable_fab.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:liquid_progress_indicator_v2/liquid_progress_indicator.dart';
 import 'package:watery/controllers/dashboard_controller.dart';
+import 'package:watery/screens/dashboard/add_drink.dart';
+import 'package:watery/screens/dashboard/drinks_list.dart';
 import 'package:watery/utils/colors.dart';
 import 'package:watery/utils/images.dart';
 
@@ -10,6 +13,8 @@ class DashboardScreen extends GetView<DashboardController> {
   DashboardScreen({Key? key}) : super(key: key);
 
   final DashboardController dashboardCon = Get.put(DashboardController());
+  final _key = GlobalKey<ExpandableFabState>();
+
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +22,8 @@ class DashboardScreen extends GetView<DashboardController> {
     var h = MediaQuery.of(context).size.height;
     var w = MediaQuery.of(context).size.width;
     return Scaffold(
-      // floatingActionButton: floatingButton(context),
+      floatingActionButtonLocation: ExpandableFab.location,
+      floatingActionButton: floatingButton(context),
       body: SizedBox(
         width: w,
         height: h,
@@ -93,7 +99,7 @@ class DashboardScreen extends GetView<DashboardController> {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(400))
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(400)),
                   ),
                     onPressed: (){},
                     child:const Text("Set Daily Limit",style: TextStyle(color: kDarkBgColor),)),
@@ -118,7 +124,7 @@ class DashboardScreen extends GetView<DashboardController> {
             child: Container(
               margin: EdgeInsets.only(top: 10,bottom: 30),
               padding: EdgeInsets.symmetric(horizontal: 20),
-              child: listOfTransactions(context),
+              child: DrinksList(),
             ),
           )
           ],
@@ -127,30 +133,7 @@ class DashboardScreen extends GetView<DashboardController> {
     );
   }
 
-  listOfTransactions(BuildContext context) {
-    return ListView.builder(
-      itemCount: 15,
-        itemBuilder: (BuildContext ctx ,int index){
-        return Dismissible(
-          key: Key(index.toString()),
-          child:  Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('500 ml',style: TextStyle(color: Colors.white,fontWeight: FontWeight.w400,fontSize: 18),),
-                  Text('10 : 30',style: TextStyle(color: Colors.white,fontWeight: FontWeight.w400,fontSize: 18),),
-                ],
-              ),
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Divider(color: Colors.white10,),
-              )
-            ],
-          ),
-        );
-    },);
-  }
+
 
   Widget transactionTitle(){
     return const  Row(
@@ -163,7 +146,51 @@ class DashboardScreen extends GetView<DashboardController> {
   }
 
   /// Floating Add Button
-  // floatingButton(BuildContext context) {
-  //   return ExpandableDraggableFab
-  // }
+  floatingButton(BuildContext context) {
+    return  ExpandableFab(
+        openButtonBuilder: RotateFloatingActionButtonBuilder(
+          child: const Icon(Icons.add),
+          fabSize: ExpandableFabSize.regular,
+          foregroundColor: kDarkBgColor,
+          backgroundColor: Colors.white,
+          shape: const CircleBorder(),
+        ),
+        closeButtonBuilder: DefaultFloatingActionButtonBuilder(
+          child: const Icon(Icons.close),
+          fabSize: ExpandableFabSize.regular,
+          foregroundColor: kDarkBgColor,
+          backgroundColor: Colors.white,
+          shape: const CircleBorder(),
+        ),
+      overlayStyle: ExpandableFabOverlayStyle(color: Colors.black38),
+      type: ExpandableFabType.up,
+        distance: 70,
+        key: _key,
+        children: [
+      FloatingActionButton.extended(
+        backgroundColor: Colors.white,
+        heroTag: null,
+        onPressed: () {}, icon: Image.asset(smalllassIcon,height: 20,),
+        label: Text("150 ml",style: TextStyle(color: kDarkBgColor),),
+      ),
+      FloatingActionButton.extended(
+        backgroundColor: Colors.white,
+        heroTag: null,
+        onPressed: () {}, icon: Image.asset(bigGlassIcon,height: 30,),
+        label: Text("250 ml",style: TextStyle(color: kDarkBgColor)),
+      ),
+      FloatingActionButton.extended(
+        backgroundColor: Colors.white,
+        heroTag: null,
+        onPressed: () {}, icon: Image.asset(bottleIcon,height: 30,),
+        label: Text("500 ml",style: TextStyle(color: kDarkBgColor)),
+      ),
+      FloatingActionButton.extended(
+        backgroundColor: Colors.white,
+        heroTag: null,
+        onPressed: () {}, icon: Icon(Icons.add,color: kDarkBgColor,),
+        label: Text("Custom",style: TextStyle(color: kDarkBgColor)),
+      ),
+    ]);
+  }
 }
