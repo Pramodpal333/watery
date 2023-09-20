@@ -6,24 +6,24 @@ import 'package:liquid_progress_indicator_v2/liquid_progress_indicator.dart';
 import 'package:watery/controllers/dashboard_controller.dart';
 import 'package:watery/screens/dashboard/add_drink.dart';
 import 'package:watery/screens/dashboard/drinks_list.dart';
+import 'package:watery/screens/set_limit.dart';
 import 'package:watery/utils/colors.dart';
 import 'package:watery/utils/images.dart';
 
 class DashboardScreen extends GetView<DashboardController> {
   DashboardScreen({Key? key}) : super(key: key);
-
-  final DashboardController dashboardCon = Get.put(DashboardController());
   final _key = GlobalKey<ExpandableFabState>();
 
 
   @override
   Widget build(BuildContext context) {
+    final DashboardController dashcontroller = Get.put(DashboardController());
     var statusBar = MediaQuery.of(context).padding.top;
     var h = MediaQuery.of(context).size.height;
     var w = MediaQuery.of(context).size.width;
     return Scaffold(
       floatingActionButtonLocation: ExpandableFab.location,
-      floatingActionButton: floatingButton(context),
+      floatingActionButton: floatingButton(context,dashcontroller),
       body: SizedBox(
         width: w,
         height: h,
@@ -58,37 +58,39 @@ class DashboardScreen extends GetView<DashboardController> {
               ),
             ),
             /// Circle Progress
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 20),
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                  color: kDarkBgColor,
-                  borderRadius: BorderRadius.circular(500),
-                  boxShadow: const [
-                    BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 20,
-                        spreadRadius: 5,
-                        offset: Offset(0.0, 25.0))
-                  ]),
-              child: LiquidCircularProgressIndicator(
-                value: 0.25,
-                // Defaults to 0.5.
-                valueColor: const AlwaysStoppedAnimation(kWaterColor),
-                // Defaults to the current Theme's accentColor.
-                backgroundColor: kDarkBgColor,
-                // Defaults to the current Theme's backgroundColor.
-                borderColor: Colors.white,
-                borderWidth: 1.0,
-                direction: Axis.vertical,
-                // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.vertical.
-                center: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("1250 ml ",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500,fontSize: 25),),
-                    const Text("Daily Goal : 3500 ml",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w300,fontSize: 12),),
-                  ],
+            Obx(
+                ()=> Container(
+                margin: const EdgeInsets.symmetric(vertical: 20),
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                    color: kDarkBgColor,
+                    borderRadius: BorderRadius.circular(500),
+                    boxShadow: const [
+                      BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 20,
+                          spreadRadius: 5,
+                          offset: Offset(0.0, 25.0))
+                    ]),
+                child: LiquidCircularProgressIndicator(
+                  value: dashcontroller.alreadyDrank.value,
+                  // Defaults to 0.5.
+                  valueColor: const AlwaysStoppedAnimation(kWaterColor),
+                  // Defaults to the current Theme's accentColor.
+                  backgroundColor: kDarkBgColor,
+                  // Defaults to the current Theme's backgroundColor.
+                  borderColor: Colors.white,
+                  borderWidth: 1.0,
+                  direction: Axis.vertical,
+                  // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.vertical.
+                  center: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                       Text("${dashcontroller.totalDrink.value} ml ",style: const TextStyle(color: Colors.white,fontWeight: FontWeight.w500,fontSize: 25),),
+                       Text("Daily Goal : ${dashcontroller.targetDrink.value} ml",style: const TextStyle(color: Colors.white,fontWeight: FontWeight.w300,fontSize: 12),),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -101,7 +103,9 @@ class DashboardScreen extends GetView<DashboardController> {
                     backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(400)),
                   ),
-                    onPressed: (){},
+                    onPressed: (){
+                    Get.to(()=> SetLimitScreen());
+                    },
                     child:const Text("Set Daily Limit",style: TextStyle(color: kDarkBgColor),)),
                 const SizedBox(width: 20,),
                 ElevatedButton(
@@ -120,13 +124,14 @@ class DashboardScreen extends GetView<DashboardController> {
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: transactionTitle()
             ),
-          Expanded(
-            child: Container(
-              margin: EdgeInsets.only(top: 10,bottom: 30),
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: DrinksList(),
+         Expanded(
+              child: Container(
+                margin: EdgeInsets.only(top: 10,bottom: 30),
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: DrinksList(),
+              ),
             ),
-          )
+
           ],
         ),
       ),
@@ -146,7 +151,7 @@ class DashboardScreen extends GetView<DashboardController> {
   }
 
   /// Floating Add Button
-  floatingButton(BuildContext context) {
+  floatingButton(BuildContext context, DashboardController dashcontroller) {
     return  ExpandableFab(
         openButtonBuilder: RotateFloatingActionButtonBuilder(
           child: const Icon(Icons.add),
@@ -170,19 +175,25 @@ class DashboardScreen extends GetView<DashboardController> {
       FloatingActionButton.extended(
         backgroundColor: Colors.white,
         heroTag: null,
-        onPressed: () {}, icon: Image.asset(smalllassIcon,height: 20,),
+        onPressed: () {
+          dashcontroller.addDrinkFun(150);
+        }, icon: Image.asset(smalllassIcon,height: 20,),
         label: Text("150 ml",style: TextStyle(color: kDarkBgColor),),
       ),
       FloatingActionButton.extended(
         backgroundColor: Colors.white,
         heroTag: null,
-        onPressed: () {}, icon: Image.asset(bigGlassIcon,height: 30,),
+        onPressed: () {
+          dashcontroller.addDrinkFun(250);
+        }, icon: Image.asset(bigGlassIcon,height: 30,),
         label: Text("250 ml",style: TextStyle(color: kDarkBgColor)),
       ),
       FloatingActionButton.extended(
         backgroundColor: Colors.white,
         heroTag: null,
-        onPressed: () {}, icon: Image.asset(bottleIcon,height: 30,),
+        onPressed: () {
+          dashcontroller.addDrinkFun(500);
+        }, icon: Image.asset(bottleIcon,height: 30,),
         label: Text("500 ml",style: TextStyle(color: kDarkBgColor)),
       ),
       FloatingActionButton.extended(
@@ -193,4 +204,5 @@ class DashboardScreen extends GetView<DashboardController> {
       ),
     ]);
   }
+
 }

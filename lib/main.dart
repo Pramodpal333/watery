@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:watery/screens/dashboard/dashboard.dart';
 import 'package:watery/utils/colors.dart';
+import 'package:get/get.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,12 +13,14 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return  MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        scaffoldBackgroundColor: kDarkBgColor
+    return  SafeArea(
+      child: GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          scaffoldBackgroundColor: kDarkBgColor
+        ),
+        home: DashboardScreen(),
       ),
-      home: DashboardScreen(),
     );
   }
 }
