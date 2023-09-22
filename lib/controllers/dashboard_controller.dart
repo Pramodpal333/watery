@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:watery/models/drinks_model.dart';
+import 'package:watery/utils/constants.dart';
 import 'package:watery/utils/custom_print.dart';
 import 'package:watery/utils/db_helper.dart';
 
-class DashboardController extends GetxController{
-
+class DashboardController extends GetxController {
   var totalDrink = 0.obs;
   var targetDrink = 4000.obs;
   var alreadyDrank = 0.0.obs;
+
   // var drinkList = RxList<DrinksModel>();
   final RxList<DrinksModel> drinkList = <DrinksModel>[].obs;
 
+  GetStorage box = GetStorage();
 
   @override
   void onInit() {
@@ -23,26 +26,32 @@ class DashboardController extends GetxController{
 
   initTask() async {
     try {
-      var drinks = await DbHelper.getDrinks();
-      println("drinks init $drinks");
-      // Convert the List<Map<String, dynamic>> to RxList<DrinksModel>
-      final convertedList = drinks.map((map) => DrinksModel.fromJson(map)).toList();
-      drinkList.assignAll(convertedList);
-    }catch(e){
+      refresh();
+    } catch (e) {
+      println("init exception dashboard > $e");
       throw Exception(e);
     }
   }
 
-  Future<void> refresh()async {
-    var drinks = await DbHelper.getDrinks();
-    final convertedList = drinks.map((map) => DrinksModel.fromJson(map)).toList();
-    drinkList.assignAll(convertedList);
-    var total = drinkList.fold(0, (int previousValue, DrinksModel drinksModel) {
-      return previousValue + drinksModel.qty!;
-    } );
-    totalDrink.value = total;
-    alreadyDrank.value = totalDrink.value / targetDrink.value;
-    println("Refreshed $total");
+  Future<void> refresh() async {
+    try {
+      int? savedTarget = box.read(AppConstant.dailyTarget);
+      targetDrink.value = savedTarget ?? 3000;
+      var drinks = await DbHelper.getDrinks();
+      println("drinks init $drinks");
+      // Convert the List<Map<String, dynamic>> to RxList<DrinksModel>
+      final convertedList =
+          drinks.map((map) => DrinksModel.fromJson(map)).toList();
+      drinkList.assignAll(convertedList);
+      totalDrink.value = drinkList.fold(0, (quantity, drink) {
+        return quantity += drink.qty!;
+      });
+      alreadyDrank.value = totalDrink.value / targetDrink.value;
+      println("Refreshed $totalDrink");
+    } catch (e) {
+      println("refresh exception dashboard > $e");
+      throw Exception(e);
+    }
   }
 
   // Function to add drinks to table
@@ -53,23 +62,26 @@ class DashboardController extends GetxController{
       // dynamic currentDate = DateFormat.yMMMd().format(DateTime.now());
       // drinkList.add(
       //     DrinksModel(qty: liter, date: DateTime.now(), time: currentTime,));
-      await DbHelper.createDrink(
-          DrinksModel(qty: liter, date: DateTime.now(), time: currentTime,));
+      await DbHelper.createDrink(DrinksModel(
+        qty: liter,
+        date: DateTime.now(),
+        time: currentTime,
+      ));
       alreadyDrank.value = totalDrink.value / targetDrink.value;
       refresh();
       println(">>>>>>>>> ${alreadyDrank.value} $currentTime");
       println(drinkList);
-    }catch(e){
+    } catch (e) {
       throw Exception(e);
     }
   }
 
-  setLimit(BuildContext context){
-    showDialog(context: context, builder: (BuildContext ctc){
-      return const AlertDialog(
-
-      );
-    });
+  setLimit(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext ctc) {
+          return const AlertDialog();
+        });
   }
 
   Future<void> dismiss(int index) async {
@@ -79,7 +91,4 @@ class DashboardController extends GetxController{
     await DbHelper.deleteDrink(id!);
     refresh();
   }
-
-
-
 }

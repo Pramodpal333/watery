@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:watery/screens/dashboard/dashboard.dart';
+import 'package:watery/screens/set_limit.dart';
+import 'package:watery/screens/splash_screen/splash_screen.dart';
 import 'package:watery/utils/colors.dart';
 import 'package:get/get.dart';
 
-void main() {
+Future<void> main() async {
+  await GetStorage.init();
   runApp(const MyApp());
 }
 
@@ -19,7 +23,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           scaffoldBackgroundColor: kDarkBgColor
         ),
-        home: DashboardScreen(),
+        home: const SplashScreen(),
       ),
     );
   }
