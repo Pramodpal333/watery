@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:liquid_progress_indicator_v2/liquid_progress_indicator.dart';
 import 'package:watery/controllers/dashboard_controller.dart';
+import 'package:watery/screens/alarm/alarm_screen.dart';
 import 'package:watery/screens/dashboard/add_drink.dart';
 import 'package:watery/screens/dashboard/drinks_list.dart';
 import 'package:watery/screens/set_limit.dart';
@@ -113,7 +114,9 @@ class DashboardScreen extends GetView<DashboardController> {
                     backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(400))
                   ),
-                    onPressed: (){},
+                    onPressed: (){
+                    Get.to(()=>Alarm());
+                    },
                     child:const Text("Alarm Setting",style: TextStyle(color: kDarkBgColor),)),
               ],
             ),

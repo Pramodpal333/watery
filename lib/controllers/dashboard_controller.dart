@@ -84,11 +84,30 @@ class DashboardController extends GetxController {
         });
   }
 
-  Future<void> dismiss(int index) async {
+  Future<void> dismiss(int index, BuildContext context) async {
+    ScaffoldMessenger.of(context).clearSnackBars();
     var id = drinkList[index].id;
+    var drink = drinkList[index];
     println(id);
     totalDrink.value -= drinkList[index].qty!;
     await DbHelper.deleteDrink(id!);
     refresh();
+    // Ask for Undo
+    ScaffoldMessenger.of(context).clearSnackBars();
+    // show undo message
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(
+      backgroundColor: Colors.red,
+      content: Text("Drink Removed"),
+      // action: SnackBarAction(
+      //   textColor: Colors.white,
+      //   label: "Undo",
+      //   onPressed: () async {
+      //     await DbHelper.createDrink(drink);
+      //     refresh();
+      //   },
+      // ),
+    )
+    );
   }
 }

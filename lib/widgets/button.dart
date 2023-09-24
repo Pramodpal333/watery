@@ -3,11 +3,12 @@ import 'package:get/get.dart';
 import 'package:watery/utils/colors.dart';
 
 class ButtonWidget extends StatelessWidget {
-  const ButtonWidget({Key? key, required this.child, this.onTap, this.color}) : super(key: key);
+  const ButtonWidget({Key? key, required this.child, this.onTap, this.color, this.splashColor}) : super(key: key);
 
   final Widget child;
   final Function()? onTap;
   final Color? color;
+  final Color? splashColor;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +19,8 @@ class ButtonWidget extends StatelessWidget {
       height: 50,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor:color ?? kDarkBgColor
+          backgroundColor:color ?? kDarkBgColor,
+              foregroundColor: splashColor ?? Colors.white24
         ),
           onPressed: onTap,
           child: child),
