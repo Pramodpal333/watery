@@ -51,4 +51,27 @@ class DbHelper {
       print("error while delete $e");
     }
   }
+
+  static Future<void> updateDrink(DrinksModel drink) async {
+    final db = await DbHelper.db();
+
+    final data = {
+      'qty': drink.qty,
+      'date': drink.date.toString(),
+      'time': drink.time,
+      'type': drink.type,
+    };
+
+    try {
+      await db.update(
+        'drinks',
+        data,
+        where: "id = ?",
+        whereArgs: [drink.id], // Assuming the drink object has an 'id' property
+      );
+    } catch (e) {
+      print("Error while updating drink: $e");
+    }
+  }
+
 }

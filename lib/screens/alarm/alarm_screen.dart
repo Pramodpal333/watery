@@ -1,11 +1,18 @@
 import 'package:day_night_time_picker/day_night_time_picker.dart';
 import 'package:day_night_time_picker/lib/daynight_timepicker.dart';
 import 'package:flutter/material.dart';
+import 'package:sound_mode/sound_mode.dart';
+import 'package:sound_mode/utils/ringer_mode_statuses.dart';
+import 'package:watery/services/local_notification.dart';
 import 'package:watery/utils/colors.dart';
 import 'package:watery/utils/custom_print.dart';
 import 'package:watery/widgets/appbar.dart';
 import 'package:watery/widgets/button.dart';
 import 'package:watery/widgets/date_picker.dart';
+import 'package:workmanager/workmanager.dart';
+import 'package:flutter/services.dart';
+
+import '../../main.dart';
 
 class Alarm extends StatefulWidget {
   Alarm({Key? key}) : super(key: key);
@@ -75,7 +82,25 @@ class _AlarmState extends State<Alarm> {
                   "Notify Me",
                   style: TextStyle(color: kDarkBgColor),
                 ),
-                onTap: () {},
+                onTap: () async {
+                  try{
+                    SystemSound.play(SystemSoundType.click);
+                    var ringerStatus = await SoundMode.ringerModeStatus;
+                    println(ringerStatus);
+                    await SoundMode.setSoundMode(RingerModeStatus.normal);
+                    println(ringerStatus);
+                    // LocalNotificationService.sendNotification("Test", "THIS IS TEST");
+                    // await Workmanager().initialize(callbackDispatcher);
+                    // await Workmanager().registerPeriodicTask(
+                    //     "test_workertask", "test_workertask",
+                    //     inputData: {"data1": "value1", "data2": "value2"},
+                    //     frequency: Duration(seconds: 1),
+                    //     initialDelay: Duration(seconds: 10),
+                    //     existingWorkPolicy: ExistingWorkPolicy.replace);
+                  }catch(e){
+                    println("==== Eror Assingin trask = $e");
+                  }
+                },
                 splashColor: kDarkBgColor,
               ),
             ),

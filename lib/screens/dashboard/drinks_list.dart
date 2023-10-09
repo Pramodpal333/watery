@@ -52,7 +52,10 @@ class DrinksList extends StatelessWidget {
                   },
                   key: Key(controller.drinkList.value[index].id!.toString()),
                   child: InkWell(
-                    onTap: () {},
+                    onTap: () {
+
+                      controller.updateDialog(context,controller.drinkList.value[index]);
+                    },
                     child: Container(
                       margin: EdgeInsets.symmetric(vertical: 10),
                       child: Row(

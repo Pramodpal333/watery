@@ -11,7 +11,7 @@ class UserInput extends StatelessWidget {
     this.showLabel,
     this.prefix,
     this.controller,
-     this.suffixText, this.validator, this.keyboardType, this.maxLength,
+     this.suffixText, this.validator, this.keyboardType, this.maxLength, this.icon, this.onTapIcon,
   }) : super(key: key);
 
   final String label;
@@ -23,6 +23,8 @@ class UserInput extends StatelessWidget {
   final String Function(String?)? validator;
   final TextInputType? keyboardType;
   final int? maxLength;
+  final IconData? icon;
+  final Function()? onTapIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -41,18 +43,28 @@ class UserInput extends StatelessWidget {
                 color: kLightGrey, borderRadius: BorderRadius.circular(8)),
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Center(
-              child: TextFormField(
-                maxLength:maxLength ,
-                keyboardType: keyboardType,
-                validator: validator,
-                controller: controller,
-                decoration: InputDecoration(
-                  counterText: "",
-                    suffixText: suffixText,
-                    icon: null,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                    hintText: hint,
-                    border: InputBorder.none),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      maxLength:maxLength ,
+                      keyboardType: keyboardType,
+                      validator: validator,
+                      controller: controller,
+                      decoration: InputDecoration(
+                        counterText: "",
+                          suffixText: suffixText,
+                          icon: null,
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                          hintText: hint,
+                          hintStyle: TextStyle(color: kHint),
+                          border: InputBorder.none),
+                    ),
+                  ),
+                  Visibility(
+                      visible: icon != null,
+                      child: IconButton(onPressed: onTapIcon, icon: Icon(icon) ))
+                ],
               ),
             )),
       ],

@@ -9,13 +9,20 @@ class MyDatePicker extends StatelessWidget {
       required this.time,
       required this.timeText,
       required this.onChange,
-      this.is24Hour})
+      this.is24Hour,
+        this.color, this.textColor, this.shadowColor, this.borderColor, this.width, this.height})
       : super(key: key);
 
   final Time time;
   final String timeText;
   Function(Time) onChange;
   final bool? is24Hour;
+  final Color? color;
+  final Color? textColor;
+  final Color? shadowColor;
+  final Color? borderColor;
+  final double? width;
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
@@ -32,15 +39,15 @@ class MyDatePicker extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: time.hour  > 9  ?18 :25,vertical: 50),
             margin: EdgeInsets.all(5),
-            // width: 200,
-            // height: 100,
+            width: width,
+            height: height,
             decoration: BoxDecoration(
-              border: Border.all(width: 0.3,color: Colors.white),
-                color: kDarkBgColor,
+              border: Border.all(width: 0.3,color: borderColor ?? Colors.white),
+                color: color?? kDarkBgColor,
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: const [
+                boxShadow:  [
                   BoxShadow(
-                      color: Colors.black45,
+                      color: shadowColor ?? Colors.black45,
                       offset: Offset(1, 1),
                       blurRadius: 50,
                       spreadRadius: 3)
@@ -49,14 +56,14 @@ class MyDatePicker extends StatelessWidget {
                 ? Text(
                     "${time.hourOfPeriod} : ${time.minute} ${time.period.name}",
                     style: TextStyle(
-                        color: Colors.white,
+                        color: textColor ?? Colors.white,
                         fontSize: w * 0.06,
                         fontWeight: FontWeight.w600),
                   )
                 : Text(
                     "${time.hour} : ${time.minute}",
                     style: TextStyle(
-                        color: Colors.white,
+                        color:textColor ??  Colors.white,
                         fontSize: w * 0.06,
                         fontWeight: FontWeight.w600),
                   ),
