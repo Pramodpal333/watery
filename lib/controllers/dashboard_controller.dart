@@ -1,5 +1,6 @@
 import 'package:day_night_time_picker/day_night_time_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
@@ -8,6 +9,7 @@ import 'package:watery/utils/colors.dart';
 import 'package:watery/utils/constants.dart';
 import 'package:watery/utils/custom_print.dart';
 import 'package:watery/utils/db_helper.dart';
+import 'package:watery/widgets/button.dart';
 import 'package:watery/widgets/date_picker.dart';
 
 import '../widgets/textfeild.dart';
@@ -19,6 +21,7 @@ class DashboardController extends GetxController {
 
   TextEditingController updateDrinkCon = TextEditingController();
   TextEditingController drinkTimeCon = TextEditingController();
+
   Time _time = Time(hour: 11, minute: 30, second: 20);
 
   // var drinkList = RxList<DrinksModel>();
@@ -51,6 +54,11 @@ class DashboardController extends GetxController {
       // Convert the List<Map<String, dynamic>> to RxList<DrinksModel>
       final convertedList =
           drinks.map((map) => DrinksModel.fromJson(map)).toList();
+      convertedList.forEach((element) {println("before sorted list ${element.date}");});
+      if(convertedList.isNotEmpty){
+        convertedList.sort((a,b)=> a.date!.compareTo(b.date!));
+      }
+      convertedList.forEach((element) {println("sorted list ${element.date}");});
       drinkList.assignAll(convertedList);
       totalDrink.value = drinkList.fold(0, (quantity, drink) {
         return quantity += drink.qty!;
@@ -71,6 +79,7 @@ class DashboardController extends GetxController {
       // dynamic currentDate = DateFormat.yMMMd().format(DateTime.now());
       // drinkList.add(
       //     DrinksModel(qty: liter, date: DateTime.now(), time: currentTime,));
+      println("this is time format $currentTime");
       await DbHelper.createDrink(DrinksModel(
         qty: liter,
         date: DateTime.now(),
@@ -118,12 +127,28 @@ class DashboardController extends GetxController {
     ));
   }
 
-  drinkUpdate(DrinksModel drink) {
+  drinkUpdate(DrinksModel drink) async {
+    var newDateTime = DateTime(drink.date!.year,drink.date!.month,drink.date!.day,_time.hourOfPeriod,_time.minute);
     println("Check ${drink.id}");
+    await DbHelper.updateDrink(DrinksModel(
+      id: drink.id,
+      qty: int.parse(updateDrinkCon.text.toString()),
+      date: newDateTime,
+      time: drinkTimeCon.text,
+      type: drink.type
+    ));
+
+    refresh();
+    Get.back();
   }
 
-  void updateDialog(BuildContext context, DrinksModel value) {
+  void updateDialog(BuildContext context, DrinksModel drink) {
+    final keyHeight = MediaQuery.of(context).viewInsets.bottom;
+    updateDrinkCon.text = drink.qty.toString();
+    drinkTimeCon.text = drink.time.toString();
     showModalBottomSheet(
+        enableDrag: true,
+        isScrollControlled: true,
         context: context,
         builder: (ctx) {
           return StatefulBuilder(
@@ -131,9 +156,12 @@ class DashboardController extends GetxController {
               return Container(
                 padding: EdgeInsets.all(20),
                 width: Get.width,
+                height: Get.height*1,
+                // height: keyHeight == 0.0 ? null : keyHeight+200,
                 decoration:
                     BoxDecoration(borderRadius: BorderRadius.circular(20)),
                 child: Column(
+                  mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
@@ -151,15 +179,50 @@ class DashboardController extends GetxController {
                       maxLength: 4,
                     ),
                     UserInput(
+                      readOnly: true,
                       label: 'Time',
                       hint: '09:05',
                       controller: drinkTimeCon,
                       keyboardType: TextInputType.number,
                       maxLength: 4,
-                      icon: Icons.date_range,
-                      onTapIcon: (){},
+                      icon: Icons.watch_later,
+                      onTapIcon: () {
+                        timePicker(ctc, setState);
+                      },
                     ),
-
+                    SizedBox(
+                      height: Get.height * 0.03,
+                    ),
+                    // Spacer(),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: ButtonWidget(
+                              borderColor: Colors.black26,
+                              color: Colors.white,
+                          child:const Text(
+                            "Cancel",
+                            style: TextStyle(color: Colors.black45),
+                          ),
+                          onTap: () {
+                            Get.back();
+                          },
+                        )),
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        Expanded(
+                            child: ButtonWidget(
+                                child: const Text(
+                                  "Update",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                onTap: () {
+                                  // println(" TESTTT $keyHeight");
+                                  drinkUpdate(drink);
+                                })),
+                      ],
+                    )
                   ],
                 ),
               );
@@ -168,12 +231,11 @@ class DashboardController extends GetxController {
         });
   }
 
-
-  timePicker(BuildContext context) {
+  timePicker(BuildContext context, StateSetter setState) {
     Navigator.of(context).push(
       showPicker(
         context: context,
-        is24HrFormat:true,
+        is24HrFormat: true,
         value: _time,
         sunrise: TimeOfDay(hour: 6, minute: 0),
         // optional
@@ -181,7 +243,12 @@ class DashboardController extends GetxController {
         // optional
         duskSpanInMinutes: 120,
         // optional
-        onChange: (time){},
+        onChange: (time) {
+          setState(() {
+            _time = time;
+            drinkTimeCon.text = "${time.hour} : ${time.minute}";
+          });
+        },
       ),
     );
   }

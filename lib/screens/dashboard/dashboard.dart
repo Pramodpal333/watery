@@ -23,6 +23,7 @@ class DashboardScreen extends GetView<DashboardController> {
     var h = MediaQuery.of(context).size.height;
     var w = MediaQuery.of(context).size.width;
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       floatingActionButtonLocation: ExpandableFab.location,
       floatingActionButton: floatingButton(context,dashcontroller),
       body: SizedBox(

@@ -53,7 +53,7 @@ class DrinksList extends StatelessWidget {
                   key: Key(controller.drinkList.value[index].id!.toString()),
                   child: InkWell(
                     onTap: () {
-
+                      // controller.timePicker(context);
                       controller.updateDialog(context,controller.drinkList.value[index]);
                     },
                     child: Container(
@@ -101,7 +101,9 @@ class DrinksList extends StatelessWidget {
                                 padding: const EdgeInsets.only(left: 8.0),
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(500),
-                                  onTap: () {},
+                                  onTap: () {
+                                    controller.updateDialog(context,controller.drinkList.value[index]);
+                                  },
                                   child: Container(
                                       width: w * 0.08,
                                       height: w * 0.08,

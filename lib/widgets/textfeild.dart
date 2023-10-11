@@ -1,22 +1,24 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:watery/utils/colors.dart';
 
 class UserInput extends StatelessWidget {
-  const UserInput({
+   UserInput({
     Key? key,
     required this.label,
     required this.hint,
     this.showLabel,
     this.prefix,
     this.controller,
-     this.suffixText, this.validator, this.keyboardType, this.maxLength, this.icon, this.onTapIcon,
+     this.suffixText, this.validator, this.keyboardType, this.maxLength, this.icon, this.onTapIcon, this.readOnly,
   }) : super(key: key);
 
   final String label;
   final String hint;
   final bool? showLabel;
+  final bool? readOnly;
   final Widget? prefix;
   final TextEditingController? controller;
   final String? suffixText;
@@ -25,6 +27,9 @@ class UserInput extends StatelessWidget {
   final int? maxLength;
   final IconData? icon;
   final Function()? onTapIcon;
+
+  final _numberFormatter = FilteringTextInputFormatter.digitsOnly;
+
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +52,9 @@ class UserInput extends StatelessWidget {
                 children: [
                   Expanded(
                     child: TextFormField(
+                      inputFormatters:keyboardType == TextInputType.number ? [_numberFormatter] :[],
+                      // enabled: enable,
+                      readOnly: readOnly ?? false,
                       maxLength:maxLength ,
                       keyboardType: keyboardType,
                       validator: validator,
